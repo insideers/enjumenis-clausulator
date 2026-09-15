@@ -28,7 +28,11 @@ async function request(path, { method = 'GET', password, body } = {}) {
   const res = await fetch(path, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined });
   const isJson = (res.headers.get('content-type') || '').includes('application/json');
   if (!isJson) {
-    const err = new Error('La API no responde. Si estás en local, arranca con `vercel dev` en lugar de `npm run dev`.');
+    const err = new Error(
+      res.status === 404
+        ? 'No se encuentra la API (/api/clausulazos). Revisa que la carpeta api esté en la raíz del repo.'
+        : `La API ha fallado (error ${res.status}). Mira el detalle en Vercel, en la pestaña Logs.`
+    );
     err.offline = true;
     throw err;
   }

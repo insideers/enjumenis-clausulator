@@ -5,12 +5,30 @@ export const KEY = 'enjumenis:clausulazos';
 
 let client;
 
+// Busca las variables aunque Vercel les haya puesto un prefijo (p. ej. STORAGE_KV_REST_API_URL)
+function findEnv(patterns) {
+  const keys = Object.keys(process.env);
+  for (const pattern of patterns) {
+    const key = keys.find((k) => pattern.test(k) && process.env[k]);
+    if (key) return process.env[key];
+  }
+  return undefined;
+}
+
 export function getRedis() {
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = findEnv([/^KV_REST_API_URL$/, /^UPSTASH_REDIS_REST_URL$/, /KV_REST_API_URL$/, /REDIS_REST_URL$/]);
+  const token = findEnv([
+    /^KV_REST_API_TOKEN$/,
+    /^UPSTASH_REDIS_REST_TOKEN$/,
+    /(?<!READ_ONLY_)KV_REST_API_TOKEN$/,
+    /(?<!READ_ONLY_)REDIS_REST_TOKEN$/,
+  ]);
   if (!url || !token) {
+    const vistas = Object.keys(process.env).filter((k) => /KV|REDIS|UPSTASH/i.test(k));
     const err = new Error(
-      'No hay base de datos conectada. En Vercel ve a Storage, crea una base Upstash Redis y conéctala al proyecto.'
+      `No encuentro las variables de Upstash Redis. ${
+        vistas.length ? `Variables parecidas que sí veo: ${vistas.join(', ')}.` : 'No veo ninguna variable de Redis.'
+      } Conecta la base de datos al proyecto en Storage y haz Redeploy.`
     );
     err.status = 503;
     throw err;
@@ -22,7 +40,7 @@ export function getRedis() {
 export async function readAll(redis) {
   const data = await redis.get(KEY);
   if (Array.isArray(data)) return data;
-  // Primera vez: se rellena con los clausulazos de las capturas.
+  // Primera vez: se rellena con los clausulazos iniciales.
   await redis.set(KEY, SEED);
   return [...SEED];
 }
