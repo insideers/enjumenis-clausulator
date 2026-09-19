@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MANAGER_NAMES } from '../../shared/managers.js';
 import { POSICIONES, normalizeClausulazo, parseImporte, normalizeCronica, managersSinMencion } from '../../shared/validate.js';
-import { addClausulazo, checkPassword, importClausulazos, saveCronica, deleteCronica } from '../lib/api.js';
+import { addClausulazo, checkPassword, importClausulazos, saveCronica, deleteCronica, deleteCronicas } from '../lib/api.js';
 import { fmtEur, todayISO } from '../lib/format.js';
 
 const PLANTILLA = {
@@ -63,6 +63,14 @@ export default function AdminPanel({ open, onClose, password, onLogin, onLogout,
       return null;
     }, `Crónica de la jornada ${data.jornada} publicada.`);
     if (ok) setCronicaText('');
+  }
+
+  async function handleBorrarTodas() {
+    if (!window.confirm('Esto borra todas las crónicas publicadas. ¿Seguro?')) return;
+    await run(async () => {
+      onCronicas(await deleteCronicas(password));
+      return null;
+    }, 'Crónicas borradas.');
   }
 
   async function handleBorrarCronica(jornada) {
@@ -219,7 +227,13 @@ export default function AdminPanel({ open, onClose, password, onLogin, onLogout,
               </div>
 
               {cronicas.length > 0 && (
-                <ul className="cronicas-list">
+                <>
+                  <div className="admin-actions">
+                    <button type="button" className="btn-ghost danger" disabled={busy || !online} onClick={handleBorrarTodas}>
+                      Borrar todas ({cronicas.length})
+                    </button>
+                  </div>
+                  <ul className="cronicas-list">
                   {[...cronicas].reverse().map((c) => (
                     <li key={c.jornada}>
                       <span>
@@ -230,7 +244,8 @@ export default function AdminPanel({ open, onClose, password, onLogin, onLogout,
                       </button>
                     </li>
                   ))}
-                </ul>
+                  </ul>
+                </>
               )}
             </div>
           ) : tab === 'nuevo' ? (

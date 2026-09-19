@@ -53,7 +53,7 @@ export default function Diario({ cronicas }) {
       </article>
 
       {c.piezas?.length > 0 && (
-        <div className="news-grid">
+        <div className="news-grid piezas-grid">
           {c.piezas.map((p, i) => (
             <article key={i} className="news-card">
               {p.kicker && <p className="news-kicker">{p.kicker}</p>}

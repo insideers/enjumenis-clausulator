@@ -65,6 +65,7 @@ export async function loadCronicas() {
 export const saveCronica = (password, cronica) => request('/api/cronicas', { method: 'PUT', password, body: cronica });
 export const deleteCronica = (password, jornada) =>
   request(`/api/cronicas?jornada=${encodeURIComponent(jornada)}`, { method: 'DELETE', password });
+export const deleteCronicas = (password) => request('/api/cronicas?todas=1', { method: 'DELETE', password });
 
 export const checkPassword = (password) => request('/api/auth', { method: 'POST', password, body: {} });
 export const addClausulazo = (password, item) => request('/api/clausulazos', { method: 'POST', password, body: item });

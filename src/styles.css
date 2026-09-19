@@ -560,7 +560,12 @@ main {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.25rem;
-  align-items: start;
+  align-items: stretch;
+}
+
+/* Las piezas del diario van de tres en tres para que las filas queden parejas */
+.piezas-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .news-card {
@@ -1383,7 +1388,7 @@ main {
   .nav { display: none; }
   .topbar { justify-content: space-between; }
   .two-col, .three-col { grid-template-columns: 1fr; }
-  .awards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .awards-grid, .piezas-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .three-col > :last-child { grid-column: auto; }
   .scoreboard { grid-template-columns: repeat(2, 1fr); }
   .scoreboard > div:nth-child(2) { border-right: 0; }
@@ -1410,7 +1415,7 @@ main {
   .profile-id { flex-direction: column; align-items: flex-start; }
   .ref-card { transform: none !important; }
   .awards-grid { grid-template-columns: 1fr; }
-  .news-grid { grid-template-columns: 1fr; }
+  .news-grid, .piezas-grid { grid-template-columns: 1fr; }
   .uno-por-uno li { grid-template-columns: auto minmax(0, 1fr) auto; }
   .nota { font-size: 1.3rem; min-width: 2.2rem; }
 }

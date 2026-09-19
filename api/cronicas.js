@@ -21,8 +21,11 @@ export default async function handler(req, res) {
       return res.status(200).json(await writeCronicas(redis, [...list, value]));
     }
 
-    // Borrar la crónica de una jornada: DELETE /api/cronicas?jornada=7
+    // Borrar crónicas: DELETE /api/cronicas?jornada=7 o DELETE /api/cronicas?todas=1
     if (req.method === 'DELETE') {
+      if (String(req.query?.todas || '') === '1') {
+        return res.status(200).json(await writeCronicas(redis, []));
+      }
       const jornada = Number.parseInt(req.query?.jornada, 10);
       const list = await readCronicas(redis);
       const next = list.filter((c) => c.jornada !== jornada);
