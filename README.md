@@ -1,8 +1,7 @@
 # Clausoremeter · Enjumenis League
 
-Dashboard de clausulazos de la Enjumenis League: seis tarjetas de premios, la portada de la semana con titulares que se escriben solos, rankings de hechos y recibidos, dinero gastado y cobrado, balance neto, matriz del rencor, calendario de atracos y ficha de cada mánager.
+Dashboard de clausulazos de la Enjumenis League: seis tarjetas de premios, la crónica semanal, rankings de hechos y recibidos, dinero gastado y cobrado, balance neto, matriz del rencor, calendario de atracos y ficha de cada mánager.
 
-La sección "La portada de la semana" coge los clausulazos de los últimos 7 días y elige los cuatro titulares con más salseo (récord, venganzas, rachas, víctimas, jugadores que no paran de mudarse…). Se actualiza sola al añadir clausulazos. Si en una semana no ha pasado nada, muestra la última semana con movimiento. Los textos están en `src/lib/news.js` por si quieres cambiarlos.
 
 Hecho con Vite + React. Los clausulazos se guardan en Upstash Redis a través de dos funciones serverless de Vercel (`/api`), y se apuntan desde la propia web.
 

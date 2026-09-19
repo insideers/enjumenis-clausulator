@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { computeStats } from './lib/stats.js';
-import { buildNews } from './lib/news.js';
 import { loadClausulazos, loadCronicas, deleteClausulazo, savedPassword } from './lib/api.js';
 import { fmtEur, fmtM, fmtSignedM, fmtFecha, haceCuanto } from './lib/format.js';
 import { HERO_LINES, pickBy, pluralClaus } from './lib/copy.js';
 import { Manager } from './components/Badge.jsx';
 import Standings from './components/Standings.jsx';
 import Awards from './components/Awards.jsx';
-import News from './components/News.jsx';
 import Diario from './components/Diario.jsx';
 import Matrix from './components/Matrix.jsx';
 import Timeline from './components/Timeline.jsx';
@@ -45,7 +43,6 @@ export default function App() {
   }, []);
 
   const stats = useMemo(() => (list ? computeStats(list) : null), [list]);
-  const news = useMemo(() => (stats ? buildNews(stats) : { items: [] }), [stats]);
 
   const login = (pw) => {
     savedPassword.set(pw);
@@ -86,7 +83,6 @@ export default function App() {
         </a>
         <nav className="nav" aria-label="Secciones">
           <a href="#premios">Premios</a>
-          <a href="#noticias">Noticias</a>
           <a href="#diario">Diario</a>
           <a href="#clasificacion">Clasificación</a>
           <a href="#taquilla">Taquilla</a>
@@ -150,20 +146,6 @@ export default function App() {
 
         <Section id="premios" title="Tarjetas y trofeos" intro="Seis tarjetas para los que mandan en el mercado. Amarilla para los que hacen daño, roja para los que lo sufren.">
           <Awards stats={stats} />
-        </Section>
-
-        <Section
-          id="noticias"
-          title="La portada de la semana"
-          intro={
-            news.items.length
-              ? `Lo que ha pasado entre el ${fmtFecha(news.desde)} y el ${fmtFecha(news.hasta)}${
-                  news.reciente ? '' : ', que es la última semana con movimiento'
-                }.`
-              : 'Aquí aparecerán los titulares en cuanto alguien vuelva a pagar una cláusula.'
-          }
-        >
-          <News news={news} />
         </Section>
 
         <Section
