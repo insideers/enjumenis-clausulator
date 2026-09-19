@@ -44,7 +44,7 @@ Abre `tu-app.vercel.app/api/clausulazos`. El mensaje que salga dice qué falta: 
 
 ## El Diario de la Enjumenis (crónica semanal)
 
-La sección "El Diario de la Enjumenis" muestra la crónica escrita a mano de cada jornada: artículo principal, piezas de salseo, vaticinios y el uno por uno con nota para los 13 mánagers. Las crónicas se guardan en la base de datos, así que **no hay que tocar el código ni desplegar nada** para publicar una nueva.
+La crónica escrita a mano de cada jornada es lo primero de la web: cabecera de periódico, teletipo con la última hora del mercado y hasta dos artículos principales. Debajo, en "Más de la jornada", van las piezas (hasta 15, por ejemplo una por equipo), los vaticinios y el uno por uno con nota. Después ya viene todo lo del mercado. Las crónicas se guardan en la base de datos, así que **no hay que tocar el código ni desplegar nada** para publicar una nueva.
 
 1. En la zona del delegado, pestaña **Crónica**.
 2. Pega el JSON de la semana. Debajo del cuadro sale una revisión: si el JSON está mal, qué falla, y qué mánagers no aparecen mencionados en ningún texto.
@@ -58,16 +58,17 @@ Formato:
 {
   "jornada": 7,
   "fecha": "2026-09-21",
-  "titular": "Titular principal",
-  "entradilla": "Resumen en una o dos frases",
-  "cuerpo": ["Párrafo uno", "Párrafo dos"],
+  "principales": [
+    { "titular": "Titular principal", "entradilla": "Resumen en una o dos frases", "cuerpo": ["Párrafo uno", "Párrafo dos"] },
+    { "titular": "Segundo titular", "entradilla": "", "cuerpo": ["Párrafo"] }
+  ],
   "piezas": [{ "kicker": "El pique", "titular": "Titular corto", "texto": "El salseo" }],
   "vaticinios": [{ "titular": "Underdog de la jornada", "texto": "La predicción" }],
   "unoPorUno": [{ "manager": "Maese Xavier", "nota": 9, "texto": "Su puyita" }]
 }
 ```
 
-Solo son obligatorios `jornada`, `titular` y algo de contenido (`cuerpo` o `piezas`). Los nombres de `manager` tienen que coincidir con los de `shared/managers.js`.
+Solo son obligatorios `jornada`, un titular en `principales` y algo de contenido (`cuerpo` o `piezas`). Los nombres de `manager` tienen que coincidir con los de `shared/managers.js`.
 
 ## Cambiar mánagers
 

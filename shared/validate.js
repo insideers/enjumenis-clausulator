@@ -67,17 +67,30 @@ function lista(v) {
   return t ? t.split(/\n{2,}/).map((x) => x.trim()).filter(Boolean) : [];
 }
 
+function principal(p) {
+  return {
+    titular: texto(p?.titular, 200),
+    entradilla: texto(p?.entradilla, 500),
+    cuerpo: lista(p?.cuerpo),
+  };
+}
+
 export function normalizeCronica(input = {}) {
   const errors = [];
   const jornada = Number.parseInt(input.jornada, 10);
 
+  // Admite "principales": [ {...}, {...} ] o el formato antiguo con titular/entradilla/cuerpo sueltos
+  const crudos = Array.isArray(input.principales) && input.principales.length
+    ? input.principales
+    : [{ titular: input.titular, entradilla: input.entradilla, cuerpo: input.cuerpo }];
+  const principales = crudos.slice(0, 2).map(principal).filter((p) => p.titular);
+
   const value = {
     jornada: Number.isFinite(jornada) ? jornada : null,
     fecha: /^\d{4}-\d{2}-\d{2}$/.test(String(input.fecha)) ? input.fecha : new Date().toISOString().slice(0, 10),
-    titular: texto(input.titular, 200),
-    entradilla: texto(input.entradilla, 500),
-    cuerpo: lista(input.cuerpo),
-    piezas: (Array.isArray(input.piezas) ? input.piezas : []).slice(0, 6).map((p) => ({
+    principales,
+    titular: principales[0]?.titular || '',
+    piezas: (Array.isArray(input.piezas) ? input.piezas : []).slice(0, 15).map((p) => ({
       kicker: texto(p?.kicker, 40),
       titular: texto(p?.titular, 160),
       texto: texto(p?.texto, 1200),
@@ -95,8 +108,10 @@ export function normalizeCronica(input = {}) {
   };
 
   if (value.jornada === null || value.jornada < 1) errors.push('Falta el número de jornada.');
-  if (!value.titular) errors.push('Falta el titular principal.');
-  if (!value.cuerpo.length && !value.piezas.length) errors.push('La crónica está vacía: pon al menos un cuerpo o una pieza.');
+  if (!principales.length) errors.push('Falta el titular principal.');
+  if (!principales.some((p) => p.cuerpo.length) && !value.piezas.length) {
+    errors.push('La crónica está vacía: pon al menos un cuerpo o una pieza.');
+  }
   value.piezas.forEach((p, i) => {
     if (!p.titular || !p.texto) errors.push(`La pieza nº ${i + 1} necesita titular y texto.`);
   });
@@ -115,6 +130,7 @@ export function managersSinMencion(cronica) {
     cronica.titular,
     cronica.entradilla,
     ...(cronica.cuerpo || []),
+    ...(cronica.principales || []).flatMap((p) => [p.titular, p.entradilla, ...(p.cuerpo || [])]),
     ...(cronica.piezas || []).flatMap((p) => [p.kicker, p.titular, p.texto]),
     ...(cronica.vaticinios || []).flatMap((v) => [v.titular, v.texto]),
     ...(cronica.unoPorUno || []).flatMap((u) => [u.manager, u.texto]),

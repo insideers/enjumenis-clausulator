@@ -7,9 +7,10 @@ import { fmtEur, todayISO } from '../lib/format.js';
 const PLANTILLA = {
   jornada: 0,
   fecha: todayISO(),
-  titular: '',
-  entradilla: '',
-  cuerpo: [''],
+  principales: [
+    { titular: '', entradilla: '', cuerpo: [''] },
+    { titular: '', entradilla: '', cuerpo: [''] },
+  ],
   piezas: [{ kicker: '', titular: '', texto: '' }],
   vaticinios: [{ titular: '', texto: '' }],
   unoPorUno: MANAGER_NAMES.map((manager) => ({ manager, nota: null, texto: '' })),

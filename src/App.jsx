@@ -6,7 +6,7 @@ import { HERO_LINES, pickBy, pluralClaus } from './lib/copy.js';
 import { Manager } from './components/Badge.jsx';
 import Standings from './components/Standings.jsx';
 import Awards from './components/Awards.jsx';
-import Diario from './components/Diario.jsx';
+import { Portada, DiarioResto } from './components/Diario.jsx';
 import Matrix from './components/Matrix.jsx';
 import Timeline from './components/Timeline.jsx';
 import Profile from './components/Profile.jsx';
@@ -32,6 +32,7 @@ export default function App() {
   const [password, setPassword] = useState(savedPassword.get());
   const [panelOpen, setPanelOpen] = useState(false);
   const [cronicas, setCronicas] = useState([]);
+  const [jornada, setJornada] = useState(null);
 
   useEffect(() => {
     loadClausulazos().then(({ data, online: ok, message }) => {
@@ -39,10 +40,15 @@ export default function App() {
       setOnline(ok);
       setOfflineMsg(message);
     });
-    loadCronicas().then(setCronicas);
+    loadCronicas().then((data) => {
+      setCronicas(data);
+      if (data.length) setJornada(data[data.length - 1].jornada);
+    });
   }, []);
 
   const stats = useMemo(() => (list ? computeStats(list) : null), [list]);
+
+  const cronica = cronicas.find((x) => x.jornada === jornada) || cronicas[cronicas.length - 1] || null;
 
   const login = (pw) => {
     savedPassword.set(pw);
@@ -84,6 +90,7 @@ export default function App() {
         <nav className="nav" aria-label="Secciones">
           <a href="#premios">Premios</a>
           <a href="#diario">Diario</a>
+          <a href="#mercado">Mercado</a>
           <a href="#clasificacion">Clasificación</a>
           <a href="#taquilla">Taquilla</a>
           <a href="#rencor">Rencor</a>
@@ -97,13 +104,30 @@ export default function App() {
       {!online && <p className="banner">Modo solo lectura con los datos iniciales. {offlineMsg}</p>}
 
       <main id="top">
+        <Portada cronica={cronica} cronicas={cronicas} jornada={jornada} onJornada={setJornada} stats={stats} />
+
+        {cronica && (
+          <Section
+            id="diario"
+            title="Más de la jornada"
+            intro="Una pieza por equipo, los vaticinios y el uno por uno con nota. Sin piedad."
+          >
+            <DiarioResto cronica={cronica} />
+          </Section>
+        )}
+
+        <section id="mercado" className="mercado-intro">
+          <h2>Y ahora, el mercado</h2>
+          <p>Quién roba, quién paga y quién se queda sin plantilla. Todos los clausulazos de la Enjumenis.</p>
+        </section>
+
         <section className="hero">
           {u ? (
             <div className="hero-inner">
               <p className="hero-kicker">
                 Último clausulazo, {haceCuanto(u.fecha)}
               </p>
-              <h1 className="hero-player">{u.jugador}</h1>
+              <h2 className="hero-player">{u.jugador}</h2>
               <div className="hero-route">
                 <Manager name={u.vendedor} size="lg" />
                 <span className="hero-arrow" aria-label="pasa a">
@@ -116,7 +140,7 @@ export default function App() {
             </div>
           ) : (
             <div className="hero-inner">
-              <h1 className="hero-player">Mercado en calma</h1>
+              <h2 className="hero-player">Mercado en calma</h2>
               <p className="hero-line">Nadie ha pagado una cláusula todavía. Sospechoso.</p>
             </div>
           )}
@@ -146,14 +170,6 @@ export default function App() {
 
         <Section id="premios" title="Tarjetas y trofeos" intro="Seis tarjetas para los que mandan en el mercado. Amarilla para los que hacen daño, roja para los que lo sufren.">
           <Awards stats={stats} />
-        </Section>
-
-        <Section
-          id="diario"
-          title="El Diario de la Enjumenis"
-          intro="La crónica de la jornada, el salseo, los vaticinios y el uno por uno. Escrito a mano, sin piedad."
-        >
-          <Diario cronicas={cronicas} />
         </Section>
 
         <Section id="clasificacion" title="Clasificación del clausulazo" intro="Quién roba y a quién le roban. El que tenga un cero puede presumir, de momento.">
