@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { computeStats } from './lib/stats.js';
-import { loadClausulazos, deleteClausulazo, savedPassword } from './lib/api.js';
-import { fmtEur, fmtM, fmtSignedM, haceCuanto } from './lib/format.js';
+import { buildNews } from './lib/news.js';
+import { loadClausulazos, loadCronicas, deleteClausulazo, savedPassword } from './lib/api.js';
+import { fmtEur, fmtM, fmtSignedM, fmtFecha, haceCuanto } from './lib/format.js';
 import { HERO_LINES, pickBy, pluralClaus } from './lib/copy.js';
 import { Manager } from './components/Badge.jsx';
 import Standings from './components/Standings.jsx';
 import Awards from './components/Awards.jsx';
+import News from './components/News.jsx';
+import Diario from './components/Diario.jsx';
 import Matrix from './components/Matrix.jsx';
 import Timeline from './components/Timeline.jsx';
 import Profile from './components/Profile.jsx';
@@ -30,6 +33,7 @@ export default function App() {
   const [offlineMsg, setOfflineMsg] = useState('');
   const [password, setPassword] = useState(savedPassword.get());
   const [panelOpen, setPanelOpen] = useState(false);
+  const [cronicas, setCronicas] = useState([]);
 
   useEffect(() => {
     loadClausulazos().then(({ data, online: ok, message }) => {
@@ -37,9 +41,11 @@ export default function App() {
       setOnline(ok);
       setOfflineMsg(message);
     });
+    loadCronicas().then(setCronicas);
   }, []);
 
   const stats = useMemo(() => (list ? computeStats(list) : null), [list]);
+  const news = useMemo(() => (stats ? buildNews(stats) : { items: [] }), [stats]);
 
   const login = (pw) => {
     savedPassword.set(pw);
@@ -80,6 +86,8 @@ export default function App() {
         </a>
         <nav className="nav" aria-label="Secciones">
           <a href="#premios">Premios</a>
+          <a href="#noticias">Noticias</a>
+          <a href="#diario">Diario</a>
           <a href="#clasificacion">Clasificación</a>
           <a href="#taquilla">Taquilla</a>
           <a href="#rencor">Rencor</a>
@@ -90,11 +98,7 @@ export default function App() {
         </button>
       </header>
 
-      {!online && (
-        <p className="banner">
-          Modo solo lectura con los datos iniciales. {offlineMsg}
-        </p>
-      )}
+      {!online && <p className="banner">Modo solo lectura con los datos iniciales. {offlineMsg}</p>}
 
       <main id="top">
         <section className="hero">
@@ -144,8 +148,30 @@ export default function App() {
           </dl>
         </section>
 
-        <Section id="premios" title="Tarjetas y trofeos" intro="Amarilla para los que hacen daño, roja para los que lo sufren. Nadie sale limpio.">
+        <Section id="premios" title="Tarjetas y trofeos" intro="Seis tarjetas para los que mandan en el mercado. Amarilla para los que hacen daño, roja para los que lo sufren.">
           <Awards stats={stats} />
+        </Section>
+
+        <Section
+          id="noticias"
+          title="La portada de la semana"
+          intro={
+            news.items.length
+              ? `Lo que ha pasado entre el ${fmtFecha(news.desde)} y el ${fmtFecha(news.hasta)}${
+                  news.reciente ? '' : ', que es la última semana con movimiento'
+                }.`
+              : 'Aquí aparecerán los titulares en cuanto alguien vuelva a pagar una cláusula.'
+          }
+        >
+          <News news={news} />
+        </Section>
+
+        <Section
+          id="diario"
+          title="El Diario de la Enjumenis"
+          intro="La crónica de la jornada, el salseo, los vaticinios y el uno por uno. Escrito a mano, sin piedad."
+        >
+          <Diario cronicas={cronicas} />
         </Section>
 
         <Section id="clasificacion" title="Clasificación del clausulazo" intro="Quién roba y a quién le roban. El que tenga un cero puede presumir, de momento.">
@@ -209,7 +235,7 @@ export default function App() {
       </main>
 
       <footer className="footer">
-        <p>Clausoremeter de la Enjumenis League. Los datos los apunta el delegado; las lágrimas, cada uno en su casa.</p>
+        <p>Clausoremeter de la Enjumenis League. Los clausulazos los apunta el delegado; las lágrimas, cada uno en su casa.</p>
       </footer>
 
       <AdminPanel
@@ -221,6 +247,8 @@ export default function App() {
         online={online}
         list={stats.list}
         onData={setList}
+        cronicas={cronicas}
+        onCronicas={setCronicas}
       />
     </>
   );

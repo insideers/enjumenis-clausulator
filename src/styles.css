@@ -118,6 +118,28 @@ h4 {
   color: var(--chalk);
 }
 
+.banner ul {
+  margin: 0.3rem 0 0;
+  padding-left: 1.2rem;
+  font-weight: 500;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.35rem;
+  color: var(--chalk-soft);
+}
+
+.admin-body code,
+.steps code {
+  background: var(--pitch-deep);
+  padding: 0 0.3rem;
+  border-radius: 3px;
+  color: var(--chalk);
+}
+
 .banner {
   margin: 0;
   padding: 0.6rem clamp(1rem, 4vw, 3rem);
@@ -422,7 +444,7 @@ main {
 /* ---------- Awards: tarjetas de árbitro ---------- */
 .awards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
   align-items: start;
 }
@@ -441,8 +463,8 @@ main {
 .ref-red { background: var(--red); color: #fff; }
 .ref-white { background: var(--chalk); }
 
-.ref-card:nth-child(3n + 1) { transform: rotate(-0.6deg); }
-.ref-card:nth-child(3n + 2) { transform: rotate(0.5deg); }
+.award-slot:nth-child(3n + 1) .ref-card { transform: rotate(-0.6deg); }
+.award-slot:nth-child(3n + 2) .ref-card { transform: rotate(0.5deg); }
 
 .ref-card h4 {
   font-style: italic;
@@ -509,6 +531,227 @@ main {
   gap: 0.35rem;
   font-variant-numeric: tabular-nums;
 }
+
+.menciones {
+  margin-top: 1.5rem;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-panel);
+  padding: 1.1rem 1.25rem;
+  background: rgba(12, 51, 32, 0.55);
+}
+
+.menciones h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.menciones ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+  color: var(--chalk-soft);
+}
+
+/* ---------- Noticias ---------- */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.news-card {
+  background: var(--chalk);
+  color: var(--ink);
+  border-radius: var(--radius-panel);
+  padding: 1.25rem;
+  border-top: 6px solid var(--red);
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+}
+
+.news-kicker {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.news-card h3 {
+  font-size: 1.65rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.news-body {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.news-date {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a6152;
+}
+
+ /* ---------- Diario ---------- */
+.diario {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.jornadas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.jornadas button {
+  border: 2px solid var(--line);
+  background: transparent;
+  color: var(--chalk-soft);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  font-family: var(--display);
+  font-weight: 800;
+}
+
+.jornadas button[aria-selected='true'] {
+  background: var(--chalk);
+  border-color: var(--chalk);
+  color: var(--ink);
+}
+
+.diario-main {
+  background: var(--chalk);
+  color: var(--ink);
+  border-radius: var(--radius-panel);
+  border-top: 8px solid var(--red);
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  max-width: 70ch;
+}
+
+.diario-kicker {
+  margin: 0 0 0.5rem;
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.diario-main h3 {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.diario-entradilla {
+  margin: 0.9rem 0 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.diario-parrafo {
+  margin: 0.9rem 0 0;
+  line-height: 1.6;
+}
+
+.vaticinios {
+  border: 2px dashed var(--yellow);
+  border-radius: var(--radius-panel);
+  padding: 1.25rem;
+}
+
+.vaticinios h4,
+.uno-por-uno h4 {
+  font-family: var(--display);
+  font-size: 1.7rem;
+  font-weight: 900;
+  font-style: italic;
+  margin-bottom: 0.75rem;
+}
+
+.vaticinios-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.vaticinios-list p {
+  margin: 0;
+  color: var(--chalk-soft);
+}
+
+.vaticinio-titular {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--yellow) !important;
+  margin-bottom: 0.2rem !important;
+}
+
+.uno-por-uno {
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-panel);
+  padding: 1.25rem;
+  background: rgba(12, 51, 32, 0.55);
+}
+
+.uno-por-uno ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.uno-por-uno li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.7rem 0;
+  border-top: 1px solid rgba(242, 245, 239, 0.12);
+}
+
+.uno-por-uno li:first-child {
+  border-top: 0;
+}
+
+.uno-por-uno p {
+  margin: 0.15rem 0 0;
+  color: var(--chalk-soft);
+  font-size: 0.95rem;
+}
+
+.nota {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 1.6rem;
+  min-width: 2.6rem;
+  text-align: center;
+  border-radius: 6px;
+  padding: 0.1rem 0.4rem;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.nota-alta { background: var(--yellow); }
+.nota-media { background: var(--chalk-soft); }
+.nota-baja { background: var(--red); color: #fff; }
 
 /* ---------- Standings ---------- */
 .standings {
@@ -1091,6 +1334,41 @@ main {
 .notice.ok { background: var(--yellow); color: var(--ink); }
 .notice.error { background: var(--red); color: #fff; }
 
+.revision {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.revision p { margin: 0; }
+.revision-ok { color: var(--yellow); font-weight: 600; }
+.revision-error { color: #ff8a93; font-weight: 600; }
+.revision-aviso { color: var(--chalk-soft); }
+
+.cronicas-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.cronicas-list li {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  padding-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.cronicas-list span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ---------- Footer ---------- */
 .footer {
   border-top: 2px solid var(--line);
@@ -1105,6 +1383,7 @@ main {
   .nav { display: none; }
   .topbar { justify-content: space-between; }
   .two-col, .three-col { grid-template-columns: 1fr; }
+  .awards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .three-col > :last-child { grid-column: auto; }
   .scoreboard { grid-template-columns: repeat(2, 1fr); }
   .scoreboard > div:nth-child(2) { border-right: 0; }
@@ -1130,6 +1409,10 @@ main {
   .profile-rel { grid-template-columns: 1fr; }
   .profile-id { flex-direction: column; align-items: flex-start; }
   .ref-card { transform: none !important; }
+  .awards-grid { grid-template-columns: 1fr; }
+  .news-grid { grid-template-columns: 1fr; }
+  .uno-por-uno li { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .nota { font-size: 1.3rem; min-width: 2.2rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

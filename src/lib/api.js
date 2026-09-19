@@ -54,6 +54,18 @@ export async function loadClausulazos() {
   }
 }
 
+export async function loadCronicas() {
+  try {
+    return await request('/api/cronicas');
+  } catch {
+    return [];
+  }
+}
+
+export const saveCronica = (password, cronica) => request('/api/cronicas', { method: 'PUT', password, body: cronica });
+export const deleteCronica = (password, jornada) =>
+  request(`/api/cronicas?jornada=${encodeURIComponent(jornada)}`, { method: 'DELETE', password });
+
 export const checkPassword = (password) => request('/api/auth', { method: 'POST', password, body: {} });
 export const addClausulazo = (password, item) => request('/api/clausulazos', { method: 'POST', password, body: item });
 export const deleteClausulazo = (password, id) =>
