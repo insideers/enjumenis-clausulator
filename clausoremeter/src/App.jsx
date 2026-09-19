@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { computeStats } from './lib/stats.js';
 import { buildNews } from './lib/news.js';
-import { loadClausulazos, deleteClausulazo, savedPassword } from './lib/api.js';
+import { loadClausulazos, loadCronicas, deleteClausulazo, savedPassword } from './lib/api.js';
 import { fmtEur, fmtM, fmtSignedM, fmtFecha, haceCuanto } from './lib/format.js';
 import { HERO_LINES, pickBy, pluralClaus } from './lib/copy.js';
 import { Manager } from './components/Badge.jsx';
 import Standings from './components/Standings.jsx';
 import Awards from './components/Awards.jsx';
 import News from './components/News.jsx';
+import Diario from './components/Diario.jsx';
 import Matrix from './components/Matrix.jsx';
 import Timeline from './components/Timeline.jsx';
 import Profile from './components/Profile.jsx';
@@ -32,6 +33,7 @@ export default function App() {
   const [offlineMsg, setOfflineMsg] = useState('');
   const [password, setPassword] = useState(savedPassword.get());
   const [panelOpen, setPanelOpen] = useState(false);
+  const [cronicas, setCronicas] = useState([]);
 
   useEffect(() => {
     loadClausulazos().then(({ data, online: ok, message }) => {
@@ -39,6 +41,7 @@ export default function App() {
       setOnline(ok);
       setOfflineMsg(message);
     });
+    loadCronicas().then(setCronicas);
   }, []);
 
   const stats = useMemo(() => (list ? computeStats(list) : null), [list]);
@@ -84,6 +87,7 @@ export default function App() {
         <nav className="nav" aria-label="Secciones">
           <a href="#premios">Premios</a>
           <a href="#noticias">Noticias</a>
+          <a href="#diario">Diario</a>
           <a href="#clasificacion">Clasificación</a>
           <a href="#taquilla">Taquilla</a>
           <a href="#rencor">Rencor</a>
@@ -162,6 +166,14 @@ export default function App() {
           <News news={news} />
         </Section>
 
+        <Section
+          id="diario"
+          title="El Diario de la Enjumenis"
+          intro="La crónica de la jornada, el salseo, los vaticinios y el uno por uno. Escrito a mano, sin piedad."
+        >
+          <Diario cronicas={cronicas} />
+        </Section>
+
         <Section id="clasificacion" title="Clasificación del clausulazo" intro="Quién roba y a quién le roban. El que tenga un cero puede presumir, de momento.">
           <div className="two-col">
             <Standings
@@ -235,6 +247,8 @@ export default function App() {
         online={online}
         list={stats.list}
         onData={setList}
+        cronicas={cronicas}
+        onCronicas={setCronicas}
       />
     </>
   );

@@ -43,6 +43,33 @@ Formato de cada clausulazo:
 
 Abre `tu-app.vercel.app/api/clausulazos`. El mensaje que salga dice qué falta: la base de datos sin conectar, la carpeta `api` fuera de la raíz del repo o un despliegue anterior a las variables.
 
+## El Diario de la Enjumenis (crónica semanal)
+
+La sección "El Diario de la Enjumenis" muestra la crónica escrita a mano de cada jornada: artículo principal, piezas de salseo, vaticinios y el uno por uno con nota para los 13 mánagers. Las crónicas se guardan en la base de datos, así que **no hay que tocar el código ni desplegar nada** para publicar una nueva.
+
+1. En la zona del delegado, pestaña **Crónica**.
+2. Pega el JSON de la semana. Debajo del cuadro sale una revisión: si el JSON está mal, qué falla, y qué mánagers no aparecen mencionados en ningún texto.
+3. Pulsa **Publicar crónica**. Si ya existe una crónica con esa jornada, se sustituye.
+
+Desde esa misma pestaña se borran crónicas antiguas, y el botón "Pegar plantilla vacía" rellena el cuadro con la estructura completa y los 13 mánagers listos.
+
+Formato:
+
+```json
+{
+  "jornada": 7,
+  "fecha": "2026-09-21",
+  "titular": "Titular principal",
+  "entradilla": "Resumen en una o dos frases",
+  "cuerpo": ["Párrafo uno", "Párrafo dos"],
+  "piezas": [{ "kicker": "El pique", "titular": "Titular corto", "texto": "El salseo" }],
+  "vaticinios": [{ "titular": "Underdog de la jornada", "texto": "La predicción" }],
+  "unoPorUno": [{ "manager": "Maese Xavier", "nota": 9, "texto": "Su puyita" }]
+}
+```
+
+Solo son obligatorios `jornada`, `titular` y algo de contenido (`cuerpo` o `piezas`). Los nombres de `manager` tienen que coincidir con los de `shared/managers.js`.
+
 ## Cambiar mánagers
 
 La lista de equipos, sus nombres cortos y colores está en `shared/managers.js`. Si alguien cambia el nombre del equipo, cámbialo ahí y también en los clausulazos antiguos: exporta la copia, busca y reemplaza, e importa con "Reemplazar todo".

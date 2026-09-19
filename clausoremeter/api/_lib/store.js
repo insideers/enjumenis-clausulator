@@ -2,6 +2,7 @@ import { Redis } from '@upstash/redis';
 import { SEED } from '../../shared/seed.js';
 
 export const KEY = 'enjumenis:clausulazos';
+export const CRONICAS_KEY = 'enjumenis:cronicas';
 
 let client;
 
@@ -77,4 +78,15 @@ export function readBody(req) {
     }
   }
   return req.body;
+}
+
+export async function readCronicas(redis) {
+  const data = await redis.get(CRONICAS_KEY);
+  return Array.isArray(data) ? data : [];
+}
+
+export async function writeCronicas(redis, list) {
+  const ordenadas = [...list].sort((a, b) => a.jornada - b.jornada);
+  await redis.set(CRONICAS_KEY, ordenadas);
+  return ordenadas;
 }

@@ -1,17 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
 import { MANAGER_NAMES } from '../../shared/managers.js';
-import { POSICIONES, normalizeClausulazo, parseImporte } from '../../shared/validate.js';
-import { addClausulazo, checkPassword, importClausulazos } from '../lib/api.js';
+import { POSICIONES, normalizeClausulazo, parseImporte, normalizeCronica, managersSinMencion } from '../../shared/validate.js';
+import { addClausulazo, checkPassword, importClausulazos, saveCronica, deleteCronica } from '../lib/api.js';
 import { fmtEur, todayISO } from '../lib/format.js';
+
+const PLANTILLA = {
+  jornada: 0,
+  fecha: todayISO(),
+  titular: '',
+  entradilla: '',
+  cuerpo: [''],
+  piezas: [{ kicker: '', titular: '', texto: '' }],
+  vaticinios: [{ titular: '', texto: '' }],
+  unoPorUno: MANAGER_NAMES.map((manager) => ({ manager, nota: null, texto: '' })),
+};
 
 const EMPTY = { jugador: '', club: '', posicion: '', comprador: '', vendedor: '', importe: '', fecha: '' };
 
-export default function AdminPanel({ open, onClose, password, onLogin, onLogout, online, list, onData }) {
+export default function AdminPanel({ open, onClose, password, onLogin, onLogout, online, list, onData, cronicas, onCronicas }) {
   const dialogRef = useRef(null);
   const [tab, setTab] = useState('nuevo');
   const [pw, setPw] = useState('');
   const [form, setForm] = useState({ ...EMPTY, fecha: todayISO() });
   const [importText, setImportText] = useState('');
+  const [cronicaText, setCronicaText] = useState('');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
 
@@ -25,6 +37,41 @@ export default function AdminPanel({ open, onClose, password, onLogin, onLogout,
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const preview = parseImporte(form.importe);
+
+  // Repasa la crónica que se está pegando: errores y mánagers sin mencionar
+  let revision = null;
+  if (cronicaText.trim()) {
+    try {
+      const { value, errors } = normalizeCronica(JSON.parse(cronicaText));
+      revision = { errors, faltan: managersSinMencion(value), jornada: value.jornada };
+    } catch {
+      revision = { errors: ['Ese texto no es un JSON válido. Revisa comas y corchetes.'], faltan: [] };
+    }
+  }
+
+  async function handleCronica() {
+    let data;
+    try {
+      data = JSON.parse(cronicaText);
+    } catch {
+      setMsg({ type: 'error', text: 'Ese texto no es un JSON válido. Revisa comas y corchetes.' });
+      return;
+    }
+    const ok = await run(async () => {
+      const result = await saveCronica(password, data);
+      onCronicas(result);
+      return null;
+    }, `Crónica de la jornada ${data.jornada} publicada.`);
+    if (ok) setCronicaText('');
+  }
+
+  async function handleBorrarCronica(jornada) {
+    if (!window.confirm(`¿Borrar la crónica de la jornada ${jornada}?`)) return;
+    await run(async () => {
+      onCronicas(await deleteCronica(password, jornada));
+      return null;
+    }, `Crónica de la jornada ${jornada} borrada.`);
+  }
 
   async function run(fn, success) {
     setBusy(true);
@@ -127,12 +174,66 @@ export default function AdminPanel({ open, onClose, password, onLogin, onLogout,
             <button type="button" role="tab" aria-selected={tab === 'nuevo'} onClick={() => setTab('nuevo')}>
               Apuntar clausulazo
             </button>
+            <button type="button" role="tab" aria-selected={tab === 'cronica'} onClick={() => setTab('cronica')}>
+              Crónica
+            </button>
             <button type="button" role="tab" aria-selected={tab === 'datos'} onClick={() => setTab('datos')}>
               Importar y exportar
             </button>
           </div>
 
-          {tab === 'nuevo' ? (
+          {tab === 'cronica' ? (
+            <div className="admin-data">
+              <p>
+                Pega aquí la crónica de la jornada en JSON. Si ya existe una crónica con esa misma jornada, se
+                sustituye.
+              </p>
+              <label className="field">
+                <span>JSON de la crónica</span>
+                <textarea value={cronicaText} onChange={(e) => setCronicaText(e.target.value)} rows={10} spellCheck={false} />
+              </label>
+
+              {revision && (
+                <div className="revision">
+                  {revision.errors.length > 0 ? (
+                    <p className="revision-error">{revision.errors.join(' ')}</p>
+                  ) : (
+                    <p className="revision-ok">Crónica de la jornada {revision.jornada}, lista para publicar.</p>
+                  )}
+                  {revision.faltan.length > 0 && (
+                    <p className="revision-aviso">
+                      No aparecen por ninguna parte: {revision.faltan.join(', ')}. Se puede publicar igual, pero alguien
+                      se va a quedar sin su ración.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="admin-actions">
+                <button type="button" className="btn-primary" disabled={busy || !cronicaText || !online} onClick={handleCronica}>
+                  Publicar crónica
+                </button>
+                <button type="button" className="btn-ghost" onClick={() => setCronicaText(JSON.stringify(PLANTILLA, null, 2))}>
+                  Pegar plantilla vacía
+                </button>
+              </div>
+
+              {cronicas.length > 0 && (
+                <ul className="cronicas-list">
+                  {[...cronicas].reverse().map((c) => (
+                    <li key={c.jornada}>
+                      <span>
+                        <strong>Jornada {c.jornada}</strong> · {c.titular}
+                      </span>
+                      <button type="button" className="btn-ghost danger" disabled={busy || !online} onClick={() => handleBorrarCronica(c.jornada)}>
+                        Borrar
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : tab === 'nuevo' ? (
             <form className="admin-form" onSubmit={handleAdd}>
               <label className="field span-2">
                 <span>Jugador</span>
